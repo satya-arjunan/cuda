@@ -1,0 +1,1 @@
+nvcc -O3 -arch=sm_52 prand_bench.cu -lprand -I../../include -L../../lib
