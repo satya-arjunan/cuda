@@ -1,1 +1,2 @@
 nvcc RandomNumberGeneration.cu -lcurand
+nvcc -O3 -arch=sm_52 curand_bench.cu -lcurand
