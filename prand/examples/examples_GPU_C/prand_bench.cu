@@ -9,7 +9,7 @@ int main(void){
   mt19937_init_device_consts_();
   mt19937_init_(&state); 
   clock_t start=clock();
-  mt19937_generate_gpu_array_(&state,dev_out,n);
+  for(unsigned i=0;i<100;i++) mt19937_generate_gpu_array_(&state,dev_out,n);
   cudaDeviceSynchronize();
   printf("time1 = %f seconds\n",(float)(clock()-start)/CLOCKS_PER_SEC);
   mt19937_free_device_consts_();

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <curand.h>
 
+//best results: 41.3 BUPS
+
 int main(){
   size_t n = 536870912;
   int i;
@@ -8,7 +10,8 @@ int main(){
   float *devData;
   float f;
   cudaMalloc((void **)&devData, n * sizeof(float));
-  curandCreateGenerator(&gen,CURAND_RNG_PSEUDO_MT19937);
+  //curandCreateGenerator(&gen,CURAND_RNG_PSEUDO_MT19937);
+  curandCreateGenerator(&gen,CURAND_RNG_PSEUDO_XORWOW);
   curandSetPseudoRandomGeneratorSeed(gen, 1234ULL);
   clock_t start=clock();
   for(i=0;i<100;i++) curandGenerateUniform(gen, devData, n);
