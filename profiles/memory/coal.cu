@@ -42,10 +42,19 @@ cudaError_t checkCuda(cudaError_t result)
 }
 
 template <typename T>
-__global__ void offset(T* a, int s)
+__global__ void offset(T* a, int s, int n)
 {
   int i = blockDim.x * blockIdx.x + threadIdx.x + s;
-  a[i] = a[i] + 1;
+  const unsigned total_threads(blockDim.x*gridDim.x);
+  while(i < n) {
+    a[i] = a[i] + 1;
+    i += total_threads;
+  }
+
+  /*
+  if(threadIdx.x == 0) 
+    printf("inside:%d\n", i);
+    */
 }
 
 template <typename T>
@@ -65,6 +74,7 @@ void runTest(int deviceId, int nMB)
   cudaEvent_t startEvent, stopEvent;
     
   int n = nMB*1024*1024/sizeof(T);
+  printf("nmB:%d, size:%d\n", nMB, sizeof(T));
 
   // NB:  d_a(33*nMB) for stride case
   checkCuda( cudaMalloc(&d_a, n * 33 * sizeof(T)) );
@@ -72,15 +82,16 @@ void runTest(int deviceId, int nMB)
   checkCuda( cudaEventCreate(&startEvent) );
   checkCuda( cudaEventCreate(&stopEvent) );
 
-  printf("Offset, Bandwidth (GB/s):\n");
+  printf("Offset, Bandwidth (GB/s): blocks:%d %d\n", blockSize, n/blockSize);
   
-  offset<<<n/blockSize, blockSize>>>(d_a, 0); // warm up
+  offset<<<64, 256>>>(d_a, 0, n); // warm up
 
-  for (int i = 0; i <= 32; i++) {
+  for (int i = 0; i < 1; i++) {
     checkCuda( cudaMemset(d_a, 0, n * sizeof(T)) );
 
     checkCuda( cudaEventRecord(startEvent,0) );
-    offset<<<n/blockSize, blockSize>>>(d_a, i);
+    //offset<<<n/blockSize, blockSize>>>(d_a, i, n);
+    offset<<<102400, 256>>>(d_a, i, n);
     checkCuda( cudaEventRecord(stopEvent,0) );
     checkCuda( cudaEventSynchronize(stopEvent) );
 
@@ -89,10 +100,11 @@ void runTest(int deviceId, int nMB)
   }
 
   printf("\n");
+  /*
   printf("Stride, Bandwidth (GB/s):\n");
 
   stride<<<n/blockSize, blockSize>>>(d_a, 1); // warm up
-  for (int i = 1; i <= 32; i++) {
+  for (int i = 1; i < 1; i++) {
     checkCuda( cudaMemset(d_a, 0, n * sizeof(T)) );
 
     checkCuda( cudaEventRecord(startEvent,0) );
@@ -103,6 +115,7 @@ void runTest(int deviceId, int nMB)
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent) );
     printf("%d, %f\n", i, 2*nMB/ms);
   }
+  */
 
   checkCuda( cudaEventDestroy(startEvent) );
   checkCuda( cudaEventDestroy(stopEvent) );
@@ -111,7 +124,7 @@ void runTest(int deviceId, int nMB)
 
 int main(int argc, char **argv)
 {
-  int nMB = 4;
+  int nMB = 100;
   int deviceId = 0;
   bool bFp64 = false;
 
