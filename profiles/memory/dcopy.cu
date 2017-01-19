@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #define DCOPY_THREADS  384
-#define DCOPY_DEFLEN   10000000
-#define DCOPY_ITER     10           // as in STREAM benchmark
+#define DCOPY_DEFLEN   20000000
+#define DCOPY_ITER     1000          // as in STREAM benchmark
 
 // Macro to catch CUDA errors in CUDA runtime calls
 #define CUDA_SAFE_CALL(call)                                          \
@@ -150,7 +150,7 @@ int main (int argc, char *argv[])
         if (elapsed < mintime) mintime = elapsed;
     }
     printf ("dcopy: mintime = %.3f msec  throughput = %.2f GB/sec\n",
-            1.0e3 * mintime, (2.0e-9 * sizeof(d_a[0]) * opts.len) / mintime);
+        1.0e3 * mintime, (2.0e-9 * sizeof(d_a[0]) * opts.len) / mintime);
 
     CUDA_SAFE_CALL (cudaFree(d_a));
     CUDA_SAFE_CALL (cudaFree(d_b));
