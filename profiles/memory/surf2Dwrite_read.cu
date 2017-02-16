@@ -1,5 +1,7 @@
-//to compile with global memory: nvcc -O3 -gencode arch=compute_52,code=sm_52 -DUSE_GLOBAL surf2Dwrite_ex.cu
-//to compile with surface memory: nvcc -O3 -gencode arch=compute_52,code=sm_52 surf2Dwrite_ex.cu
+//to compile with global memory:
+//nvcc -O3 -gencode arch=compute_52,code=sm_52 -DUSE_GLOBAL surf2Dwrite_ex.cu
+//to compile with surface memory:
+//nvcc -O3 -gencode arch=compute_52,code=sm_52 surf2Dwrite_ex.cu
 
 #include <stdio.h>
 #include <iostream>
