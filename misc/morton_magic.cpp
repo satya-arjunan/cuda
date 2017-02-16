@@ -809,8 +809,27 @@ void decode_magicbits(const uint32_t m, uint16_t& x, uint16_t& y, uint16_t& z){
 	z = get_third_bits(m >> 2);
 }
 
+/*
+uint64_t split_3bits(const uint32_t a) {
+	uint64_t x = a;
+	x = x & 0x1f000000001ffff;
+	x = (x | x << 16) & 0x1f0000ff0000ff;
+	x = (x | x << 8)  & 0x100f00f00f00f00f;
+	x = (x | x << 4)  & 0x10c30c30c30c30c3;
+	x = (x | x << 2)  & 0x1249249249249249;
+	return x;
+}
+
+uint64_t encode_magicbits(const uint32_t x, const uint32_t y, const uint32_t z){
+	return split_3bits(x) |
+    (split_3bits(y) << 1) |
+    (split_3bits(z) << 2);
+}
+*/
+
 
 int main(int argc, char *argv[]) {
+  /*
   std::cout << "testing encode:" << std::endl;
   for(uint16_t x(0); x != 16; ++x) {
     for(uint16_t y(0); y != 16; ++y) {
@@ -836,4 +855,13 @@ int main(int argc, char *argv[]) {
         " cy:" << cy << " z:" << z << " cz:" << cz << std::endl;
     }
   }
+  */
+  uint16_t x(16*16), y(16*16), z(16*16);
+  uint32_t vdx(z + y*151 + x*151*151);
+  uint32_t correct(0);
+  //uint32_t correct(encode[vdx]);
+  uint32_t result(encode_magicbits(x, y, z) & 0x0fffffff);
+  std::cout << "res:" << result << " correct:" << correct << std::endl;
+  decode_magicbits(result, x, y, z);
+  std::cout << "vdx:" << vdx << " x:" << x << " y:" << y << " z:" << z << std::endl;
 }
